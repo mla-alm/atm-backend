@@ -1,3 +1,4 @@
+using AtmBackend.Services;
 using OpenTelemetry.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,10 @@ builder.Services.AddCors(options =>
                 .AllowAnyHeader();
         });
 });
+
+builder.Services.AddTransient<IAccountService, AccountService>();
+builder.Services.AddTransient<IDenominationService, DenominationService>();
+builder.Services.AddTransient<IWithdrawalService, WithdrawalService>();
 
 builder.Services.AddControllers();
 

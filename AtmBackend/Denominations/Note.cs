@@ -1,6 +1,6 @@
 namespace AtmBackend.Denominations;
 
-public record Note : Denomination
+internal record Note : Denomination
 {
     public static Note Note50 => new(50);
     public static Note Note100 => new(100);

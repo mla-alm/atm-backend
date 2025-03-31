@@ -1,6 +1,6 @@
 namespace AtmBackend.Denominations;
 
-public record Coin : Denomination
+internal record Coin : Denomination
 {
     public static Coin Coin1 => new(1, 10);
     public static Coin Coin2 => new(2, 30);

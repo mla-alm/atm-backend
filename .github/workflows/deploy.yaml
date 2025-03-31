@@ -1,0 +1,58 @@
+name: deploy lambda
+
+on:
+  push:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.100' # The .NET SDK version to use
+  ENVIRONMENT: 'Production'
+  BACKEND_KEY: atm/atmBackend-publish.zip
+  BACKEND_LAMBDA: enalyzer-backend
+
+defaults:
+  run:
+    working-directory: ./AtmBackend
+
+jobs:
+  deploy-lambda:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Install AWS Lambda Tools
+      run: dotnet tool install -g Amazon.Lambda.Tools
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Build Lambda
+      run: dotnet lambda package --configuration Release --framework net8.0 --output-package ${{ github.workspace }}/out/immersus-publish.zip --no-restore --environment-variables ASPNETCORE_ENVIRONMENT=${{ env.ENVIRONMENT }}
+
+    - name: Upload file to bucket
+      uses: a-sync/s3-uploader@master
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
+        AWS_REGION: ${{ secrets.AWS_S3_BUCKET_REGION }}
+        S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        S3_KEY: ${{ env.BACKEND_KEY }}
+        FILE: ${{ github.workspace }}/out/immersus-publish.zip
+
+    - name: Deploy Lambda from S3
+      uses: rotarydialer/update-lambda-s3@main
+      env:
+        LAMBDA_NAME: ${{ env.BACKEND_LAMBDA }}
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_S3_KEY: ${{ env.BACKEND_KEY }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
+        AWS_REGION: ${{ secrets.AWS_S3_BUCKET_REGION }}

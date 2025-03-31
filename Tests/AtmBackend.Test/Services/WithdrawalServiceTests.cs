@@ -52,8 +52,8 @@ public class WithdrawalServiceTests
 
         // Assert
         List<DenominationResponse> expected = [
-            new(1, note.Name, note.PayBox),
-            new(4, coin.Name, coin.PayBox)
+            new(1, note.Name, note.PayBox, note.Value),
+            new(4, coin.Name, coin.PayBox, coin.Value)
         ];
 
         Assert.Equal(expected, actual);

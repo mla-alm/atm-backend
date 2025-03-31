@@ -1,11 +1,13 @@
 using AtmBackend.Models.Requests;
 using AtmBackend.Models.Responses;
 using AtmBackend.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AtmBackend.Controllers;
 
 [Route("api/withdrawal")]
+[EnableCors(PolicyName = "AllowAll")]
 public class WithdrawalController(IWithdrawalService withdrawalService) : ControllerBase
 {
     [HttpPost]

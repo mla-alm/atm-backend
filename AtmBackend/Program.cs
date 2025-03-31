@@ -72,3 +72,5 @@ if (app.Environment.IsDevelopment())
 }
 
 await app.RunAsync();
+
+public partial class Program { }
